@@ -67,7 +67,7 @@ function rubies-rehash -d "Rebuild list of valid Rubies"
 	set -U __rubies_candidates
 	complete -e -c rubies-select
 
-	for candidate in (find $rubies_directory -depth 1 -type d)
+	for candidate in (find $rubies_directory -maxdepth 1 -type d)
 		if [ -x $candidate/bin/ruby ]
 			set -U __rubies_candidates $__rubies_candidates $candidate/bin/ruby
 			complete -c rubies-select -f -a (basename $candidate)
