@@ -22,13 +22,15 @@ your `config.fish`:
 
 	. /path/to/rubies-fish/rubies.fish
 
-Then use `rubies-select` to see all available versions, and
-`rubies-select <version>` to select a Ruby.
+Then use `rubies-select` to see all available versions.
 
-You can also run `rubies-select -l <version>` to select a version
-specific to the current shell, and `rubies-select -g` to go back to
-the global version. This is just a convenience wrapper around
-setting/unsetting `RUBY_VERSION` manually.
+Select a global Ruby to use for all shells by running
+`rubies-select -g <version>`.
+
+You can also run `rubies-select <version>` to select a version
+specific to the current shell. Specify `global` as the version
+to go back to the global Ruby version. The same effect can be
+achieved by setting the environment variable `RUBY_VERSION`.
 
 Run `rubies-rehash` after installing new Rubies (or relaunch your
 shell)

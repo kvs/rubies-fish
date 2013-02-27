@@ -52,28 +52,28 @@ function rubies-select -d "Show or set which Ruby version to use"
 		# Select version from $argv
 
 		switch $argv[1]
-			case '-l'
+			case '-g'
 				if __rubies-valid-version $argv[2]
-					set -g RUBY_VERSION $argv[2]
-					echo (set_color green)"* Switched Ruby version for this shell to $argv[2]."(set_color normal)
+					echo (set_color green)"* Switched global Ruby version to $argv."(set_color normal)
+					set -U rubies_version $argv[2]
+					if test $__rubies_active_scope != global
+						echo (set_color yellow)"* NOTE: local override ($__rubies_active_scope) in effect."(set_color normal)
+					end
 				else
 					echo (set_color red)"* Sorry, you didn't specify a known version."(set_color normal)
 					return 1
 				end
-			case '-g'
-				if set -q RUBY_VERSION
-					set -e RUBY_VERSION
-					echo (set_color green)"* Switched to global Ruby version ($__rubies_active_version)."(set_color normal)
-				else
-					echo (set_color yellow)"* No local override in effect."(set_color normal)
-				end
 			case '*'
-				if __rubies-valid-version $argv
-					echo (set_color green)"* Switched global Ruby version to $argv."(set_color normal)
-					set -U rubies_version $argv
-					if [ $__rubies_active_scope != global ]
-						echo (set_color yellow)"* NOTE: local override ($__rubies_active_scope) in effect."(set_color normal)
+				if test $argv = global
+					if set -q RUBY_VERSION
+						set -e RUBY_VERSION
+						echo (set_color green)"* Switched Ruby version for this shell back to global ($__rubies_active_version)."(set_color normal)
+					else
+						echo (set_color yellow)"* No local override in effect."(set_color normal)
 					end
+				else if __rubies-valid-version $argv
+					set -g RUBY_VERSION $argv
+					echo (set_color green)"* Switched Ruby version for this shell to $argv[1]."(set_color normal)
 				else
 					echo (set_color red)"* Sorry, you didn't specify a known version."(set_color normal)
 					return 1
