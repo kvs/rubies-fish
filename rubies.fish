@@ -48,7 +48,7 @@ function rubies-select -d "Show or set which Ruby version to use"
 		switch $argv[1]
 			case '-g'
 				if __rubies-valid-version $argv[2]
-					echo (set_color green)"* Switched global Ruby version to $argv."(set_color normal)
+					echo (set_color green)"* Switched global Ruby version to $argv[2]."(set_color normal)
 					set -U rubies_version $argv[2]
 					if test $__rubies_active_scope != global
 						echo (set_color yellow)"* NOTE: local override ($__rubies_active_scope) in effect."(set_color normal)
