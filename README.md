@@ -32,9 +32,6 @@ specific to the current shell. Specify `global` as the version
 to go back to the global Ruby version. The same effect can be
 achieved by setting the environment variable `RUBY_VERSION`.
 
-Run `rubies-rehash` after installing new Rubies (or relaunch your
-shell)
-
 
 ## Installing Rubies
 

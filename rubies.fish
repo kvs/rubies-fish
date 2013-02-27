@@ -31,18 +31,12 @@ end
 function rubies-select -d "Show or set which Ruby version to use"
 	if test -z $argv[1]
 		echo "The following Ruby versions are available for use:"
-		for rubyver in (ls $rubies_directory)
+		for rubyver in (__rubies-valid-versions)
 			if test $rubyver = $__rubies_active_version
 				echo (set_color green)" . $rubyver (current, $__rubies_active_scope)"(set_color normal)
-			else if test -x $rubies_directory/$rubyver/bin/ruby
+			else
 				echo " . $rubyver"
 			end
-		end
-
-		if test $__rubies_active_version = system
-			echo (set_color green)" . system (current, $__rubies_active_scope)"(set_color normal)
-		else
-			echo " . system"
 		end
 
 		if set -q __rubies_active_invalid
@@ -80,19 +74,6 @@ function rubies-select -d "Show or set which Ruby version to use"
 				end
 		end
 	end
-end
-
-function rubies-rehash -d "Rebuild list of valid Rubies"
-	for candidate in (find $rubies_directory -maxdepth 1 -type d)
-		if [ -x $candidate/bin/ruby ]
-			set shortnames (basename $candidate) $shortnames
-		end
-	end
-
-	complete -e -c rubies-select
-	complete -c rubies-select -n '__fish_not_contain_opt -s g' -x -s l -d "Select shell-local Ruby version" -a "$shortnames system" -A
-	complete -c rubies-select -n '__fish_not_contain_opt -s l -s g' -f -d "Select global Ruby version" -a "$shortnames system" -A
-	complete -c rubies-select -n '__fish_not_contain_opt -s l' -f -s g -d "Switch back to global Ruby version" -A
 end
 
 
@@ -151,21 +132,28 @@ end
 
 # Check if a given Ruby version is installed and executable
 function __rubies-valid-version
-	if test $argv = system
+	if contains $argv (__rubies-valid-versions)
 		return 0
-	else if test -x $rubies_directory/$argv/bin/ruby
-		return 0
+	else
+		return 1
 	end
-
-	return 1
 end
 
-# Wrapper to ensure 'rubies-rehash' is run after installing a new Ruby with ruby-build
-function ruby-build
-	command ruby-build $argv
-	rubies-rehash
+# Get a list of all valid Ruby versions
+function __rubies-valid-versions
+	for candidate in (find $rubies_directory -maxdepth 1 -type d)
+		if [ -x $candidate/bin/ruby ]
+			basename $candidate
+		end
+	end
+	echo system
 end
+
+
+# Tab completion support
+complete -e -c rubies-select
+complete -c rubies-select -n '__fish_not_contain_opt -s g' -f      -d "Select shell-local Ruby version" -a "(__rubies-valid-versions) global" -A
+complete -c rubies-select                                  -f -s g -d "Select global Ruby version" -a "(__rubies-valid-versions)" -A
 
 # Fire it up
-rubies-rehash
 __rubies-update
