@@ -29,7 +29,7 @@ end
 ## USER FUNCTIONS
 
 function rubies-select -d "Show or set which Ruby version to use"
-	if test -z $argv
+	if test -z $argv[1]
 		echo "The following Ruby versions are available for use:"
 		for rubyver in (ls $rubies_directory)
 			if test $rubyver = $__rubies_active_version
@@ -50,31 +50,49 @@ function rubies-select -d "Show or set which Ruby version to use"
 		end
 	else
 		# Select version from $argv
-		if [ $argv = "system" -o -x $rubies_directory/$argv/bin/ruby ]
-			echo (set_color green)"* Switched global Ruby version to $argv."(set_color normal)
-			set -U rubies_version $argv
-			if [ $__rubies_active_scope != global ]
-				echo (set_color yellow)"* NOTE: local override ($__rubies_active_scope) in effect."(set_color normal)
-			end
-		else
-			echo (set_color red)"* Sorry, you didn't specify a known version."(set_color normal)
-			return 1
+
+		switch $argv[1]
+			case '-l'
+				if __rubies-valid-version $argv[2]
+					set -g RUBY_VERSION $argv[2]
+					echo (set_color green)"* Switched Ruby version for this shell to $argv[2]."(set_color normal)
+				else
+					echo (set_color red)"* Sorry, you didn't specify a known version."(set_color normal)
+					return 1
+				end
+			case '-g'
+				if set -q RUBY_VERSION
+					set -e RUBY_VERSION
+					echo (set_color green)"* Switched to global Ruby version ($__rubies_active_version)."(set_color normal)
+				else
+					echo (set_color yellow)"* No local override in effect."(set_color normal)
+				end
+			case '*'
+				if __rubies-valid-version $argv
+					echo (set_color green)"* Switched global Ruby version to $argv."(set_color normal)
+					set -U rubies_version $argv
+					if [ $__rubies_active_scope != global ]
+						echo (set_color yellow)"* NOTE: local override ($__rubies_active_scope) in effect."(set_color normal)
+					end
+				else
+					echo (set_color red)"* Sorry, you didn't specify a known version."(set_color normal)
+					return 1
+				end
 		end
 	end
 end
 
 function rubies-rehash -d "Rebuild list of valid Rubies"
-	set -U __rubies_candidates
-	complete -e -c rubies-select
-
 	for candidate in (find $rubies_directory -maxdepth 1 -type d)
 		if [ -x $candidate/bin/ruby ]
-			set -U __rubies_candidates $__rubies_candidates $candidate/bin/ruby
-			complete -c rubies-select -f -a (basename $candidate)
+			set shortnames (basename $candidate) $shortnames
 		end
 	end
-	complete -c rubies-select -f -a system
-	complete -c rubies-select -A
+
+	complete -e -c rubies-select
+	complete -c rubies-select -n '__fish_not_contain_opt -s g' -x -s l -d "Select shell-local Ruby version" -a "$shortnames system" -A
+	complete -c rubies-select -n '__fish_not_contain_opt -s l -s g' -f -d "Select global Ruby version" -a "$shortnames system" -A
+	complete -c rubies-select -n '__fish_not_contain_opt -s l' -f -s g -d "Switch back to global Ruby version" -A
 end
 
 
