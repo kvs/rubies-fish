@@ -43,4 +43,4 @@ the directory by setting the universal variable `rubies-directory`
 to something else - eg. add the following line to your `config.fish`
 to share Rubies with `rbenv`:
 
-	set -U rubies-directory ~/.rbenv/versions
+	set -U rubies_directory ~/.rbenv/versions
