@@ -1,4 +1,5 @@
 # rubies-fish
+# -*- mode: fish; tab-width: 2; indent-tabs-mode: t -*-
 #
 # (c) Copyright 2013, Kenneth Vestergaard <kvs@binarysolutions.dk>.
 #
@@ -82,7 +83,7 @@ end
 
 # Determine active Ruby version for current shell/cwd, and
 # update PATH to match.
-function __rubies-update -v RUBY_VERSION -v rubies_version -v PWD
+function __rubies-update -v RUBY_VERSION -v rubies_version -v PWD -e rubies-ruby-version-changed
 	if set -q __rubies_active_version
 		set __prev_rubies_active_version $__rubies_active_version
 	else
@@ -128,6 +129,8 @@ function __rubies-update -v RUBY_VERSION -v rubies_version -v PWD
 	if test $__rubies_active_version != system
 		set -x PATH $rubies_directory/$__rubies_active_version/bin $PATH
 	end
+
+	emit fish_prompt
 end
 
 # Check if a given Ruby version is installed and executable
@@ -149,6 +152,11 @@ function __rubies-valid-versions
 	echo system
 end
 
+if functions -q fish_watch
+	function __rubies-track-ruby-version -v PWD --on-event rubies-ruby-version-changed
+		fish_watch rubies-ruby-version-changed $PWD/.ruby-version
+	end
+end
 
 # Tab completion support
 complete -e -c rubies-select
