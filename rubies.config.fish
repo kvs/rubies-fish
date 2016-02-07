@@ -1,7 +1,7 @@
 # rubies-fish
 # -*- mode: fish; tab-width: 2; indent-tabs-mode: t -*-
 #
-# (c) Copyright 2013, Kenneth Vestergaard <kvs@binarysolutions.dk>.
+# (c) Copyright 2013-2016, Kenneth Vestergaard <kvs@binarysolutions.dk>.
 #
 # A Ruby version switcher for fish.
 #
