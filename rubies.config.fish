@@ -130,7 +130,9 @@ function __rubies-update -v RUBY_VERSION -v rubies_version -v PWD -e rubies-ruby
 		set -x PATH $rubies_directory/$__rubies_active_version/bin $PATH
 	end
 
-	emit fish_prompt
+	if status --is-interactive
+		emit fish_prompt
+	end
 end
 
 # Check if a given Ruby version is installed and executable
